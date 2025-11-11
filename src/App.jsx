@@ -32,6 +32,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { TaskMasterProvider } from './contexts/TaskMasterContext';
 import { TasksSettingsProvider } from './contexts/TasksSettingsContext';
 import { WebSocketProvider, useWebSocketContext } from './contexts/WebSocketContext';
+import { SwarmProvider } from './contexts/SwarmContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useVersionCheck } from './hooks/useVersionCheck';
 import useLocalStorage from './hooks/useLocalStorage';
@@ -950,14 +951,16 @@ function App() {
         <WebSocketProvider>
           <TasksSettingsProvider>
             <TaskMasterProvider>
-              <ProtectedRoute>
-                <Router>
-                  <Routes>
-                    <Route path="/" element={<AppContent />} />
-                    <Route path="/session/:sessionId" element={<AppContent />} />
-                  </Routes>
-                </Router>
-              </ProtectedRoute>
+              <SwarmProvider>
+                <ProtectedRoute>
+                  <Router>
+                    <Routes>
+                      <Route path="/" element={<AppContent />} />
+                      <Route path="/session/:sessionId" element={<AppContent />} />
+                    </Routes>
+                  </Router>
+                </ProtectedRoute>
+              </SwarmProvider>
             </TaskMasterProvider>
           </TasksSettingsProvider>
         </WebSocketProvider>
