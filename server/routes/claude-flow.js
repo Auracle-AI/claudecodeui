@@ -8,7 +8,7 @@
 
 import express from 'express';
 import { spawn } from 'child_process';
-import { swarmDb } from '../database/db.js';
+import { swarmDb, credentialsDb } from '../database/db.js';
 import crypto from 'crypto';
 import path from 'path';
 
@@ -179,6 +179,19 @@ router.post('/swarm/execute', async (req, res) => {
 
     sendEvent('status', { message: 'Initializing swarm...', sessionId });
 
+    // Get Claude API key from database
+    const claudeApiKey = credentialsDb.getActiveCredential(userId, 'claude_api_key');
+    if (!claudeApiKey) {
+      const errorMsg = 'Claude API key not configured. Please add your Claude API key in settings.';
+      sendEvent('error', { message: errorMsg, sessionId });
+      if (streaming) {
+        res.end();
+      } else {
+        res.status(400).json({ error: errorMsg });
+      }
+      return;
+    }
+
     // Execute claude-flow command
     const args = ['claude-flow@alpha', 'swarm', taskDescription, '--claude'];
     if (swarmType === 'hive-mind') {
@@ -188,7 +201,11 @@ router.post('/swarm/execute', async (req, res) => {
     const startTime = Date.now();
     const claudeFlowProcess = spawn('npx', args, {
       cwd: swarmSession.project_path,
-      stdio: ['pipe', 'pipe', 'pipe']
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: {
+        ...process.env,
+        ANTHROPIC_API_KEY: claudeApiKey
+      }
     });
 
     let stdout = '';
@@ -359,6 +376,15 @@ router.post('/memory/store', async (req, res) => {
       });
     }
 
+    // Get Claude API key from database
+    const claudeApiKey = credentialsDb.getActiveCredential(userId, 'claude_api_key');
+    if (!claudeApiKey) {
+      return res.status(400).json({
+        error: 'Claude API key not configured',
+        details: 'Please add your Claude API key in settings'
+      });
+    }
+
     const startTime = Date.now();
 
     // Execute claude-flow memory store command
@@ -366,7 +392,11 @@ router.post('/memory/store', async (req, res) => {
 
     const memoryProcess = spawn('npx', args, {
       cwd: projectPath,
-      env: { ...process.env, MEMORY_NAMESPACE: namespace },
+      env: {
+        ...process.env,
+        MEMORY_NAMESPACE: namespace,
+        ANTHROPIC_API_KEY: claudeApiKey
+      },
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
@@ -442,6 +472,15 @@ router.post('/memory/query', async (req, res) => {
       });
     }
 
+    // Get Claude API key from database
+    const claudeApiKey = credentialsDb.getActiveCredential(userId, 'claude_api_key');
+    if (!claudeApiKey) {
+      return res.status(400).json({
+        error: 'Claude API key not configured',
+        details: 'Please add your Claude API key in settings'
+      });
+    }
+
     const startTime = Date.now();
 
     // Execute claude-flow memory query command
@@ -450,7 +489,11 @@ router.post('/memory/query', async (req, res) => {
 
     const memoryProcess = spawn('npx', args, {
       cwd: projectPath,
-      env: { ...process.env, MEMORY_NAMESPACE: namespace },
+      env: {
+        ...process.env,
+        MEMORY_NAMESPACE: namespace,
+        ANTHROPIC_API_KEY: claudeApiKey
+      },
       stdio: ['pipe', 'pipe', 'pipe']
     });
 

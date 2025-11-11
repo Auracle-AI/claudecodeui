@@ -127,6 +127,46 @@ claude mcp add claude-flow npx claude-flow@alpha mcp start
 
 The swarm schema is automatically initialized on server start. No manual migration needed.
 
+### Configure Claude API Key
+
+**REQUIRED**: Claude-flow requires an Anthropic API key to function. You must configure this before using any swarm or memory operations.
+
+**Method 1: Via Database (Direct)**
+
+```bash
+node -e "
+const Database = require('better-sqlite3');
+const db = new Database('server/database/auth.db');
+
+const userId = 1; // Your user ID
+const stmt = db.prepare('INSERT INTO user_credentials (user_id, credential_name, credential_type, credential_value, description) VALUES (?, ?, ?, ?, ?)');
+stmt.run(userId, 'Claude API Key', 'claude_api_key', 'your-api-key-here', 'Claude API key for claude-flow orchestration');
+console.log('✅ Claude API key configured successfully!');
+"
+```
+
+**Method 2: Via API (Recommended)**
+
+```bash
+# Get your auth token first by logging in
+TOKEN="your-jwt-token"
+
+# Add Claude API key via API
+curl -X POST http://localhost:3001/api/credentials \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "credentialName": "Claude API Key",
+    "credentialType": "claude_api_key",
+    "credentialValue": "sk-ant-api03-...",
+    "description": "Claude API key for claude-flow orchestration"
+  }'
+```
+
+**Get your Claude API key from**: https://console.anthropic.com/settings/keys
+
+**Note**: The API key is stored securely in the database and automatically injected into all claude-flow operations.
+
 ---
 
 ## Usage
