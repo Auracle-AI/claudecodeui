@@ -70,6 +70,7 @@ import commandsRoutes from './routes/commands.js';
 import settingsRoutes from './routes/settings.js';
 import agentRoutes from './routes/agent.js';
 import projectsRoutes from './routes/projects.js';
+import claudeFlowRoutes from './routes/claude-flow.js';
 import { initializeDatabase } from './database/db.js';
 import { validateApiKey, authenticateToken, authenticateWebSocket } from './middleware/auth.js';
 
@@ -249,6 +250,9 @@ app.use('/api/settings', authenticateToken, settingsRoutes);
 
 // Agent API Routes (uses API key authentication)
 app.use('/api/agent', agentRoutes);
+
+// Claude-Flow Orchestration API Routes (protected)
+app.use('/api/claude-flow', authenticateToken, claudeFlowRoutes);
 
 // Serve public files (like api-docs.html)
 app.use(express.static(path.join(__dirname, '../public')));

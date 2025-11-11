@@ -24,6 +24,9 @@ import TaskList from './TaskList';
 import TaskDetail from './TaskDetail';
 import PRDEditor from './PRDEditor';
 import Tooltip from './Tooltip';
+import SwarmDashboard from './ClaudeFlow/SwarmDashboard';
+import MemoryBrowser from './ClaudeFlow/MemoryBrowser';
+import AgentSelector from './ClaudeFlow/AgentSelector';
 import { useTaskMaster } from '../contexts/TaskMasterContext';
 import { useTasksSettings } from '../contexts/TasksSettingsContext';
 import { api } from '../utils/api';
@@ -444,6 +447,45 @@ function MainContent({
                   </button>
                 </Tooltip>
               )}
+
+              {/* Swarm Tab */}
+              <Tooltip content="Swarm Orchestration" position="bottom" bgColor="bg-blue-500">
+                <button
+                  onClick={() => setActiveTab('swarm')}
+                  className={`relative px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 ${
+                    activeTab === 'swarm'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <span className="flex items-center gap-1 sm:gap-1.5">
+                    <svg className="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span className="hidden md:hidden lg:inline">Swarm</span>
+                  </span>
+                </button>
+              </Tooltip>
+
+              {/* Memory Tab */}
+              <Tooltip content="Memory Browser" position="bottom" bgColor="bg-purple-500">
+                <button
+                  onClick={() => setActiveTab('memory')}
+                  className={`relative px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 ${
+                    activeTab === 'memory'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <span className="flex items-center gap-1 sm:gap-1.5">
+                    <svg className="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                    </svg>
+                    <span className="hidden md:hidden lg:inline">Memory</span>
+                  </span>
+                </button>
+              </Tooltip>
+
                {/* <button
                 onClick={() => setActiveTab('preview')}
                 className={`relative px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 ${
@@ -451,7 +493,7 @@ function MainContent({
                     ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
-              > 
+              >
                 <span className="flex items-center gap-1 sm:gap-1.5">
                   <svg className="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -544,6 +586,27 @@ function MainContent({
             </div>
           </div>
         )}
+
+        {/* Swarm Orchestration Tab */}
+        <div className={`h-full overflow-hidden ${activeTab === 'swarm' ? 'block' : 'hidden'}`}>
+          <ErrorBoundary showDetails={true}>
+            <SwarmDashboard
+              projectName={selectedProject?.name}
+              projectPath={selectedProject?.path}
+            />
+          </ErrorBoundary>
+        </div>
+
+        {/* Memory Browser Tab */}
+        <div className={`h-full overflow-hidden ${activeTab === 'memory' ? 'block' : 'hidden'}`}>
+          <ErrorBoundary showDetails={true}>
+            <MemoryBrowser
+              projectName={selectedProject?.name}
+              projectPath={selectedProject?.path}
+            />
+          </ErrorBoundary>
+        </div>
+
         <div className={`h-full overflow-hidden ${activeTab === 'preview' ? 'block' : 'hidden'}`}>
           {/* <LivePreviewPanel
             selectedProject={selectedProject}
